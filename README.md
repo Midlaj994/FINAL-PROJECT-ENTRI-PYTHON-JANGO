@@ -1,5 +1,7 @@
 instructions
 
+if to run locally
+
 in powershell
 
 python -m venv venv
