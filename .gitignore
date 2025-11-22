@@ -13,3 +13,6 @@ __pycache__/
 db.sqlite3
 staticfiles/
 __pycache__/
+db.sqlite3
+staticfiles/
+__pycache__/
