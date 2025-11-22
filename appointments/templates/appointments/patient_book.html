@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h3 class="card-title mb-3 text-black">Book Appointment</h3>
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Specialty</label>
+            <select id="id_specialty" name="specialty_id" class="form-select">
+              <option value="">-- choose specialty --</option>
+              {% for s in specialties %}
+                <option value="{{ s.pk }}" {% if request.GET.specialty_id|stringformat:"s" == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.name }}</option>
+              {% endfor %}
+            </select>
+            <div id="specialty-error" class="text-danger small" style="display:none;"></div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Doctor</label>
+            {{ form.doctor }}
+            {% if form.doctor.errors %}
+              <div class="text-danger small">{{ form.doctor.errors|striptags }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Date</label>
+            {{ form.date }}
+            {% if form.date.errors %}<div class="text-danger small">{{ form.date.errors|striptags }}</div>{% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Visit Reason</label>
+            {{ form.reason }}
+            {% if form.reason.errors %}<div class="text-danger small">{{ form.reason.errors|striptags }}</div>{% endif %}
+          </div>
+          <button class="btn btn-primary w-100">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const specialtySelect = document.getElementById('id_specialty');
+
+  let doctorSelect = document.getElementById('id_doctor');
+  if (!doctorSelect) {
+    doctorSelect = document.querySelector('select[name="doctor"]');
+  }
+
+  if (!doctorSelect) {
+    doctorSelect = document.createElement('select');
+    doctorSelect.name = 'doctor';
+    doctorSelect.id = 'id_doctor';
+    doctorSelect.className = 'form-select';
+    const label = document.querySelector('label[for="id_doctor"]');
+    if (label) {
+      label.insertAdjacentElement('afterend', doctorSelect);
+    } else {
+      document.querySelector('form').insertBefore(doctorSelect, document.querySelector('form').children[2] || null);
+    }
+  }
+
+  function resetDoctorOptions() {
+    doctorSelect.innerHTML = '';
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = '-- choose a doctor --';
+    doctorSelect.appendChild(placeholder);
+  }
+
+  resetDoctorOptions();
+
+  specialtySelect.addEventListener('change', function() {
+    const specialtyId = specialtySelect.value;
+    resetDoctorOptions();
+
+    const specErr = document.getElementById('specialty-error');
+    if (specErr) { specErr.style.display = 'none'; specErr.textContent = ''; }
+
+    if (!specialtyId) {
+      return;
+    }
+
+    const url = "{% url 'accounts:doctors_by_specialty' %}?specialty_id=" + encodeURIComponent(specialtyId);
+
+    fetch(url, {
+      credentials: 'same-origin',
+      headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Server returned ' + response.status);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+        if (specErr) {
+          specErr.textContent = data.error;
+          specErr.style.display = 'block';
+        }
+        return;
+      }
+      if (Array.isArray(data.doctors)) {
+        data.doctors.forEach(function(doc) {
+          const opt = document.createElement('option');
+          opt.value = doc.id;
+          opt.textContent = doc.name + (doc.email ? (' — ' + doc.email) : '');
+          doctorSelect.appendChild(opt);
+        });
+      }
+    })
+    .catch(err => {
+      console.error('Error fetching doctors:', err);
+      if (specErr) {
+        specErr.textContent = 'Could not load doctors. Please try again later.';
+        specErr.style.display = 'block';
+      }
+    });
+  });
+
+  if (specialtySelect.value) {
+    specialtySelect.dispatchEvent(new Event('change'));
+  }
+});
+</script>
+
+{% endblock %}

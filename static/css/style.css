@@ -1,0 +1,174 @@
+body {
+    color: #000;
+}
+.bg-gradient {
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+    min-height: 100vh;
+}
+.navbar.bg-primary {
+    background-color: #c2c2a1 !important;
+}
+.hero-card {
+    border: 1px solid rgba(13, 110, 253, 0.2);
+}
+.btn-primary {
+    background-color: #ffffff;
+    border-color: #ffffff;
+}
+.btn-outline-primary {
+    color: #ffffff;
+    border-color: #ffffff;
+}
+.form-control, .form-select {
+    border-radius: .5rem;
+}
+.card {
+    border-radius: 1rem;
+    color: #a5a5a5;
+}
+.text-black {
+    color: #000 !important;
+}
+.icon-black {
+    filter: brightness(0) saturate(100%);
+}
+.kvtmmc {
+    background-color: #c2c2a1;
+    color: white;
+    font-size: 70px;
+    font-weight: bold;
+    font-family: "Times New Roman", serif;
+    padding: 0 20px;
+    line-height: 1;
+    display: inline-block;
+}
+.hero-section {
+    background-image: url("/static/img/doctors.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 80px 20px;
+    border-radius: 10px;
+    min-height: 600px;
+}
+.hero-section {
+    position: relative;
+}
+
+.hero-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+    z-index: 1;
+}
+
+.hero-section > * {
+    position: relative;
+    z-index: 2;
+}
+.hero-section {
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    width: 100vw;
+    position: relative;
+    left: 0%;
+    right: 100%;
+}
+.hero-section h1,
+.hero-section p {
+    color: #ffffe9 !important;
+}
+
+.hero-section::before {
+    background: rgba(0, 0, 0, 0.45);
+}
+.btn-primary {
+    background-color: #a8a88c !important;
+    border-color: #686868 !important;
+    color: #ffffff !important;
+}
+.btn-primary:hover {
+    background-color: #a19e9e !important;
+    border-color: #a19e9e !important;
+}
+.hero-card {
+    background: rgba(255,255,255,0.85) !important;
+        background-color: #c1c19b !important;
+}
+.hero-card,
+.hero-card h4,
+.hero-card ul,
+.hero-card li {
+    color: #ffffff !important;
+}
+.hero-card li::marker {
+    color: #ffffff !important;
+}
+.btn-role {
+    background-color: transparent !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 10px 20px;
+}
+.btn-role:hover {
+    background-color: #c2c2a1 !important;
+    border-color: #c2c2a1 !important;
+    color: #ffffff !important;
+}
+.btn-admin-black {
+    background-color: #000 !important;
+    border-color: #000 !important;
+    color: #fff !important;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 6px;
+}
+
+.btn-admin-black:hover {
+    background-color: #000 !important;
+    border-color: #000 !important;
+    color: #fff !important;
+}
+.btn-hero {
+  background-color: #a8a88c !important;   /* same as .btn-primary in your file */
+  border-color: #686868 !important;       /* same as .btn-primary in your file */
+  color: #ffffff !important;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+  transition: background-color 0.18s ease, transform 0.12s ease;
+  border-width: 1px !important;
+}
+.btn-hero:hover,
+.btn-hero:focus {
+  background-color: #a19e9e !important;
+  border-color: #a19e9e !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+.btn-hero .bi {
+  filter: brightness(0) invert(1);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+.btn-cancel {
+    background-color: #a8a88c !important;
+    border-color: #686868 !important;
+    color: #ffffff !important;
+    font-weight: 500;
+}
+.btn-cancel:hover {
+    background-color: #a19e9e !important;
+    border-color: #a19e9e !important;
+    color: #ffffff !important;
+}

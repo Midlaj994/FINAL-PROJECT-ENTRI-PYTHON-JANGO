@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="hero-section">
+    <div class="row align-items-center">
+        <div class="col-lg-7">
+            <h1 class="display-5 fw-bold text-black">
+                Life saving procedure<br>
+                life changing Outcomes
+            </h1>
+
+            <p class="lead text-secondary">KVTMMC & RESEARCH CENTRE.</p>
+
+            <div class="d-flex gap-2 mt-3">
+                <a href="{% url 'appointments:patient_book' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-calendar-check"></i> Book Appointment
+                </a>
+
+                {% if user.is_authenticated and user.role == "DOCTOR" %}
+                <a href="{% url 'appointments:doctor_upcoming' %}" class="btn btn-primary btn-lg">View My Appointments</a>
+                {% endif %}
+
+                {% if user.is_authenticated and user.role == "ADMIN" %}
+                <a href="{% url 'appointments:admin_dashboard' %}" class="btn btn-primary btn-lg">Admin Dashboard</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-5 d-none d-lg-block">
+            <div class="hero-card shadow-lg p-4 bg-white rounded">
+                <h4 class="text-black">Centres of Excellence</h4>
+                <ul class="list-unstyled mt-3 mb-0">
+                    <li>• Breast cancer institute</li>
+                    <li>• Advanced Ai radiation therapy </li>
+                    <li>• Best leukemia treatment centre</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

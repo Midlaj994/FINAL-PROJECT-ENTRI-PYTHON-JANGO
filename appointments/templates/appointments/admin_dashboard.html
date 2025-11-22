@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% block content %}
+<h3 class="text-black mb-3">Admin Dashboard</h3>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <strong class="text-black">Pending Bookings</strong>
+      </div>
+      <div class="card-body">
+        {% if pending %}
+        <div class="list-group">
+          {% for a in pending %}
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-bold">{{ a.date }} • {{ a.doctor.get_full_name|default:a.doctor.username }}</div>
+              <div class="small text-muted">Patient: {{ a.patient.get_full_name|default:a.patient.username }} — {{ a.reason }}</div>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="{% url 'appointments:admin_confirm' a.pk %}" class="btn btn-primary btn-sm">Confirm</a>
+              <a href="{% url 'appointments:admin_cancel' a.pk %}" class="btn btn-cancel btn-sm">Cancel</a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No pending bookings.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <strong class="text-black">Confirmed Bookings</strong>
+      </div>
+      <div class="card-body">
+        {% if confirmed %}
+        <div class="list-group">
+          {% for a in confirmed %}
+          <div class="list-group-item">
+            <div class="fw-bold">{{ a.date }} • {{ a.doctor.get_full_name|default:a.doctor.username }}</div>
+            <div class="small text-muted">Patient: {{ a.patient.get_full_name|default:a.patient.username }} — {{ a.reason }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No confirmed bookings.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <strong class="text-black">Cancelled Bookings</strong>
+      </div>
+      <div class="card-body">
+        {% if cancelled %}
+        <div class="list-group">
+          {% for a in cancelled %}
+          <div class="list-group-item">
+            <div class="fw-bold">{{ a.date }} • {{ a.doctor.get_full_name|default:a.doctor.username }}</div>
+            <div class="small text-muted">Patient: {{ a.patient.get_full_name|default:a.patient.username }} — {{ a.reason }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">No cancelled bookings.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-4">
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <strong class="text-black">Registered Doctors</strong>
+      </div>
+      <div class="card-body">
+        {% if doctors %}
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Specialty</th>
+                  <th>Email</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for d in doctors %}
+                <tr>
+                  <td>
+                    {% if d.user %}
+                      {{ d.user.get_full_name|default:d.user.username }}
+                    {% else %}
+                      {{ d.get_full_name|default:d.username }}
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if d.specialty %}
+                      {{ d.specialty.name }}
+                    {% else %}
+                      —
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if d.user %}
+                      {{ d.user.email }}
+                    {% else %}
+                      {{ d.email|default:"" }}
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <form method="post" action="{% url 'accounts:admin_remove_user' %}" onsubmit="return confirmDelete(this);" class="d-inline-block ms-1">
+                      {% csrf_token %}
+                      <input type="hidden" name="user_id" value="{{ d.user.pk }}">
+                      <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No doctors registered yet.</p>
+        {% endif %}
+      </div>
+
+      <div class="card-footer bg-white">
+        <h6 class="mb-2">Add a new doctor</h6>
+        <form method="post" class="row g-2">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add_doctor">
+          <div class="col-12">
+            {{ add_doctor_form.email.label_tag }} {{ add_doctor_form.email }}
+            {% if add_doctor_form.email.errors %}<div class="text-danger small">{{ add_doctor_form.email.errors|striptags }}</div>{% endif %}
+          </div>
+          <div class="col-12">
+            {{ add_doctor_form.password.label_tag }} {{ add_doctor_form.password }}
+            {% if add_doctor_form.password.errors %}<div class="text-danger small">{{ add_doctor_form.password.errors|striptags }}</div>{% endif %}
+          </div>
+          <div class="col-6">
+            {{ add_doctor_form.first_name.label_tag }} {{ add_doctor_form.first_name }}
+          </div>
+          <div class="col-6">
+            {{ add_doctor_form.last_name.label_tag }} {{ add_doctor_form.last_name }}
+          </div>
+          <div class="col-12">
+            {{ add_doctor_form.specialty.label_tag }} {{ add_doctor_form.specialty }}
+            {% if add_doctor_form.specialty.errors %}<div class="text-danger small">{{ add_doctor_form.specialty.errors|striptags }}</div>{% endif %}
+          </div>
+          <div class="col-12">
+            <button class="btn btn-primary btn-sm">Create Doctor</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <strong class="text-black">Registered Patients</strong>
+      </div>
+      <div class="card-body">
+        {% if patients %}
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Joined</th>
+                  <th>Email</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in patients %}
+                <tr>
+                  <td>
+                    {% if p.user %}
+                      {{ p.user.get_full_name|default:p.user.username }}
+                    {% else %}
+                      {{ p.get_full_name|default:p.username }}
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if p.user and p.user.date_joined %}{{ p.user.date_joined|date:"M d, Y" }}{% elif p.created_at %}{{ p.created_at|date:"M d, Y" }}{% else %}—{% endif %}
+                  </td>
+                  <td>
+                    {% if p.user %}
+                      {{ p.user.email }}
+                    {% else %}
+                      {{ p.email|default:"" }}
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <form method="post" action="{% url 'accounts:admin_remove_user' %}" onsubmit="return confirmDelete(this);" class="d-inline-block ms-1">
+                      {% csrf_token %}
+                      <input type="hidden" name="user_id" value="{{ p.user.pk }}">
+                      <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No patients registered yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mt-3">
+  <div class="col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <strong class="text-black">Add Specialty</strong>
+      </div>
+      <div class="card-body">
+        <form method="post" class="row g-2">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add_specialty">
+          <div class="col-12">
+            {{ add_specialty_form.name.label_tag }} {{ add_specialty_form.name }}
+            {% if add_specialty_form.name.errors %}<div class="text-danger small">{{ add_specialty_form.name.errors|striptags }}</div>{% endif %}
+          </div>
+          <div class="col-12">
+            <button class="btn btn-primary btn-sm">Create Specialty</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4">
+  <a href="{% url 'accounts:signup_admin' %}" class="btn btn-admin-black">Create New Admin User</a>
+</div>
+
+<script>
+function confirmDelete(form) {
+  return confirm("Are you sure you want to permanently remove this user? This action cannot be undone.");
+}
+</script>
+
+{% endblock %}
