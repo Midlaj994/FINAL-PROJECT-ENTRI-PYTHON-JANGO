@@ -6,19 +6,10 @@ from django.shortcuts import redirect, render
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET
-from django.shortcuts import redirect, get_object_or_404
-from django.views.decorators.http import require_POST
-
-
-
-from .forms import (
-    PatientSignUpForm,
-    AdminSignUpForm,
-    LoginForm,
-)
+from django.views.decorators.http import require_GET, require_POST
 
 from django.contrib.auth import get_user_model
+from .forms import PatientSignUpForm, AdminSignUpForm, LoginForm
 from .models import Doctor
 
 User = get_user_model()
@@ -63,7 +54,7 @@ def signup_patient(request):
 
 
 def signup_doctor(request):
-    messages.info(request, "Dear Doctor self-signup is disabled. Please contact the administrator.")
+    messages.info(request, "Doctor self-signup is disabled. Please contact the administrator.")
     return redirect("accounts:login")
 
 
@@ -89,15 +80,19 @@ def logout_view(request):
 
 @require_GET
 def doctors_by_specialty(request):
-    specialty_id = request.GET.get("specialty_id")
-    if not specialty_id:
-        return JsonResponse({"error": "specialty_id parameter required"}, status=400)
-    try:
-        specialty_pk = int(specialty_id)
-    except (TypeError, ValueError):
-        return JsonResponse({"error": "specialty_id must be an integer"}, status=400)
+    raw_id = request.GET.get("specialty_id")
 
-    qs = Doctor.objects.filter(specialty_id=specialty_pk).select_related("user").order_by("user__first_name", "user__last_name")
+    try:
+        specialty_id = int(raw_id)
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "specialty_id parameter required"}, status=400)
+
+    qs = (
+        Doctor.objects
+        .filter(specialty_id=specialty_id)
+        .select_related("user")
+        .order_by("user__first_name", "user__last_name")
+    )
 
     doctors = [
         {
@@ -107,6 +102,7 @@ def doctors_by_specialty(request):
         }
         for d in qs
     ]
+
     return JsonResponse({"doctors": doctors})
 
 
