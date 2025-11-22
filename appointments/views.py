@@ -70,17 +70,25 @@ def patient_book(request):
 
 @role_required(User.Roles.DOCTOR)
 def doctor_upcoming(request):
+    today = date_cls.today()
+
     upcoming = Appointment.objects.filter(
         doctor=request.user,
         status=Appointment.Status.CONFIRMED,
-        date__gte=date_cls.today(),
+        date__gte=today,
     ).order_by("date")
 
-    return render(
-        request,
-        "appointments/doctor_upcoming.html",
-        {"appointments": upcoming},
-    )
+    past = Appointment.objects.filter(
+        doctor=request.user,
+        status=Appointment.Status.CONFIRMED,
+        date__lt=today,
+    ).order_by("-date")
+
+    context = {
+        "upcoming_appointments": upcoming,
+        "past_appointments": past,
+    }
+    return render(request, "appointments/doctor_upcoming.html", context)
 
 
 @role_required(User.Roles.DOCTOR)
@@ -182,7 +190,7 @@ def admin_dashboard(request):
             messages.success(request, "Specialty created successfully.")
             return redirect(reverse("appointments:admin_dashboard"))
         messages.error(request, "Please fix the errors in the specialty form.")
-
+    
     specialties = Specialty.objects.all().order_by("name")
 
     context = {
